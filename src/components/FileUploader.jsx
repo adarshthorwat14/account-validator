@@ -44,31 +44,45 @@ function FileUploader() {
     reader.readAsBinaryString(file);
   };
 
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(results);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "ValidationResults");
+    XLSX.writeFile(workbook, "validated_accounts.xlsx");
+  };
+
   return (
     <div className="container">
       <h1>Excel Validator</h1>
       <input type="file" accept=".xlsx" onChange={handleFile} />
+
       {results.length > 0 && (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Row</th>
-              <th>IFSC</th>
-              <th>Account Number</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((r, i) => (
-              <tr key={i}>
-                <td>{r.row}</td>
-                <td>{r.ifsc}</td>
-                <td>{r.account}</td>
-                <td className={r.status.startsWith('✅') ? 'valid' : 'invalid'}>{r.status}</td>
+        <>
+          <button onClick={downloadExcel} style={{ margin: '15px 0', padding: '10px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px' }}>
+            Download Validated Excel
+          </button>
+
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Row</th>
+                <th>IFSC</th>
+                <th>Account Number</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {results.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.row}</td>
+                  <td>{r.ifsc}</td>
+                  <td>{r.account}</td>
+                  <td style={{ color: r.status.startsWith('✅') ? 'green' : 'red' }}>{r.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );
